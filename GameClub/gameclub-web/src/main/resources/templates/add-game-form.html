@@ -1,0 +1,108 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <link href="/bootstrap.css" rel="stylesheet"/>
+  <link href="/custom.css" rel="stylesheet"/>
+  <style>
+    p {color:red;font-weight: bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="navbar-brand">Game Club</div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+        <a class="nav-link" href="/admin_page">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item active">
+        <a class="nav-link" href="/add-game">New Game</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user/groups">Groups</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user/games">Games</a>
+      </li>
+      <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item">
+        <a class="nav-link" href="/user/mygroup">My Group</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" action="/logout">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+        Logout
+      </button>
+    </form>
+  </div>
+</nav>
+
+<div class="container" sec:authorize="hasAuthority('SUPERUSER')">
+
+  <div class="card border border-info border-3">
+    <div class="card-header bg-info">
+      <h3>Add Game</h3>
+    </div>
+    <div class="card-body bg-light">
+      <p th:if="${#fields.hasErrors('game')}" th:errors="*{game}"></p>
+      <form action="#" th:action="@{/add-game}" th:object="${game}" method="post">
+        <div class="form-group">
+          <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"/>
+          <label class="label">Name</label>
+          <input type="text" class="form-control" th:field="*{name}" name="name"/>
+        </div>
+        <div class="form-group">
+          <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}"/>
+          <label class="label">Description</label>
+          <textarea class="form-control" th:field="*{description}" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <p th:if="${#fields.hasErrors('minimumAge')}" th:errors="*{minimumAge}"/>
+          <label class="label">Minimum age</label>
+          <input type="text" class="form-control" th:field="*{minimumAge}" name="minimumAge">
+        </div>
+        <div class="row">
+          <div class="form-group col-sm">
+            <div class="row-sm mb-3">
+              <p th:if="${#fields.hasErrors('numOfPlayers_min')}" th:errors="*{numOfPlayers_min}"/>
+              <label class="label">No. players min</label>
+              <input type="number" class="form-control col-sm" th:field="*{numOfPlayers_min}" name="numOfPlayers_min">
+            </div>
+            <div class="row-sm">
+              <label class="label">No. players max</label>
+              <input type="number" class="form-control col-sm" th:field="*{numOfPlayers_max}" name="numOfPlayers_max">
+            </div>
+          </div>
+
+          <div class="form-group col-sm">
+            <div class="row-sm mb-3">
+              <p th:if="${#fields.hasErrors('playTime_min')}" th:errors="*{playTime_min}"/>
+              <label class="label">Play time min</label>
+              <input type="number" class="form-control col-sm" th:field="*{playTime_min}" name="playTime_min">
+            </div>
+            <div class="row-sm">
+              <label class="label">Play time max</label>
+              <input type="number" class="form-control col-sm" th:field="*{playTime_max}" name="playTime_max">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label">Category</label>
+          <select multiple class="form-control" th:field="*{categories}" name="categories">
+            <option value="FANTASY">Fantasy</option>
+            <option value="MYTHOLOGY">Mythology</option>
+            <option value="WAR">War</option>
+            <option value="STRATEGY">Strategy</option>
+            <option value="BUILDING">Building</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

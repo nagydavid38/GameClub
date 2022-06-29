@@ -1,0 +1,99 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/bootstrap.css" rel="stylesheet"/>
+    <link href="/custom.css" rel="stylesheet"/>
+    <style>
+        p {color:red;font-weight: bold;}
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="navbar-brand">Game Club</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+                <a class="nav-link active" href="/admin_page">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user/groups">Groups</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user/games">Games</a>
+            </li>
+            <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item active">
+                <a class="nav-link" href="/user/mygroup">My Group</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/logout">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                Logout
+            </button>
+        </form>
+    </div>
+</nav>
+<div sec:authorize="hasAuthority('GROUPADMIN')" class="container">
+
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>List of Events</h3>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table table-bordered bg-white" th:if="${!events.isEmpty()}">
+                <thead>
+                <tr>
+                    <th scope="col">Event Date</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Participants</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="event : ${events}">
+                    <td th:text="${event.getEvent_date()}"/>
+                    <td th:text="${event.getLocation()}"/>
+                    <td th:text="${event.getDescription()}"/>
+                    <td>
+                        <ul class="list-group list-group-flush" th:each="player : ${event.getParticipants()}">
+                            <li class="list-group-item" th:text="${player}"/>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p style="color: black; font-weight: normal"  th:unless="${!events.isEmpty()}">No upcoming events at the moment.</p>
+        </div>
+    </div>
+</div>
+<div sec:authorize="hasAuthority('GROUPADMIN')" class="container">
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>Add Event</h3>
+        </div>
+        <div class="card-body bg-light">
+            <form action="#" th:action="@{/user/mygroup/events-{Id}(Id=${groupId})}"  th:object="${eventModel}" method="post">
+                <div class="form-group">
+                    <p th:if="${#fields.hasErrors('event_date')}" th:errors="*{event_date}"/>
+                    <label class="label">Event Date</label>
+                    <input type="date" class="form-control" th:field="*{event_date}" name="event_date">
+                </div>
+                <div class="form-group">
+                    <p th:if="${#fields.hasErrors('location')}" th:errors="*{location}"/>
+                    <label class="label">Location</label>
+                    <input type="text" class="form-control" th:field="*{location}" name="location">
+                </div>
+                <div class="form-group">
+                    <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}"/>
+                    <label class="label">Description</label>
+                    <textarea class="form-control" th:field="*{description}" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

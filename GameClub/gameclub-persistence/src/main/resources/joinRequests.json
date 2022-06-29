@@ -1,0 +1,11 @@
+[ {
+  "id" : 14,
+  "groupId" : 1,
+  "userId" : 4,
+  "state" : "ACCEPTED"
+}, {
+  "id" : 15,
+  "groupId" : 1,
+  "userId" : 5,
+  "state" : "REJECTED"
+} ]

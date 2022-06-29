@@ -1,0 +1,62 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <link href="bootstrap.css" rel="stylesheet"/>
+  <link href="custom.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="navbar-brand">Game Club</div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item active">
+        <a class="nav-link" href="/user">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+        <a class="nav-link active" href="/admin_page">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user/groups">Groups</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user/games">Games</a>
+      </li>
+      <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item">
+        <a class="nav-link" href="/user/mygroup">My Group</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" action="/logout">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+        Logout
+      </button>
+    </form>
+  </div>
+</nav>
+<div class="container" >
+  <div class="card border border-info border-3">
+    <div class="card-header bg-info">
+      <h3>User details</h3>
+    </div>
+    <div class="card-body bg-light">
+      <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">
+          <p th:text="${name}"/>
+        </dd>
+
+        <dt class="col-sm-3">Login name</dt>
+        <dd class="col-sm-9">
+          <p th:text="${login}"/>
+        </dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">
+          <p th:text="${email}"/>
+        </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+</div>
+</body>
+</html>

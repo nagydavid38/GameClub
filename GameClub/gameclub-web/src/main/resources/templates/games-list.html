@@ -1,0 +1,115 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/bootstrap.css" rel="stylesheet"/>
+    <link href="/custom.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="navbar-brand">Game Club</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+                <a class="nav-link active" href="/admin_page">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user/groups">Groups</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item active">
+                <a class="nav-link" href="/user/games">Games</a>
+            </li>
+            <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item">
+                <a class="nav-link" href="/user/mygroup">My Group</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/logout">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                Logout
+            </button>
+        </form>
+    </div>
+</nav>
+<div class="container">
+
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>My Games</h3>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Min age</th>
+                    <th scope="col">No. players</th>
+                    <th scope="col">Play time</th>
+                    <th scope="col">Categories</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="game : ${userGames}">
+                    <td th:text="${game.getName()}"/>
+                    <td th:text="${game.getDescription()}"/>
+                    <td th:text="${game.getMinimumAge()}"/>
+                    <td th:text="${game.getNumOfPlayers_min()} + '-' + ${game.getNumOfPlayers_max()}"/>
+                    <td th:text="${game.getPlayTime_min()} + '-' + ${game.getNumOfPlayers_max()}"/>
+                    <td>
+                        <ul class="list-group list-group-flush" th:each="category : ${game.getCategories()}">
+                            <li class="list-group-item" th:text="${category}"/>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="container" th:if="${!gamesNotOwnedByPlayer.isEmpty()}">
+
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>All games</h3>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Min age</th>
+                    <th scope="col">No. players</th>
+                    <th scope="col">Play time</th>
+                    <th scope="col">Categories</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="game : ${gamesNotOwnedByPlayer}">
+                    <form action="#" th:action="@{/user/games}" th:object="${game}" method="post">
+                        <td th:text="${game.getName()}"/>
+                        <td th:text="${game.getDescription()}"/>
+                        <td th:text="${game.getMinimumAge()}"/>
+                        <td th:text="${game.getNumOfPlayers_min()} + '-' + ${game.getNumOfPlayers_max()}"/>
+                        <td th:text="${game.getPlayTime_min()} + '-' + ${game.getNumOfPlayers_max()}"/>
+                        <td>
+                            <ul class="list-group list-group-flush" th:each="category : ${game.getCategories()}">
+                                <li class="list-group-item" th:text="${category}"/>
+                            </ul>
+                        </td>
+                        <td class="text-center">
+                            <input type="hidden" th:value="${game.getId()}" name="id" />
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Add game</button>
+                        </td>
+                    </form>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

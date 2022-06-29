@@ -1,0 +1,85 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/bootstrap.css" rel="stylesheet"/>
+    <link href="/custom.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="navbar-brand">Game Club</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+                <a class="nav-link active" href="/admin_page">Home</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item active">
+                <a class="nav-link" href="/user/groups">Groups</a>
+            </li>
+            <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+                <a class="nav-link" href="/user/games">Games</a>
+            </li>
+            <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item">
+                <a class="nav-link" href="/user/mygroup">My Group</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/logout">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                Logout
+            </button>
+        </form>
+    </div>
+</nav>
+<div class="container">
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>My group membership</h3>
+        </div>
+        <div class="card-body bg-light">
+            <dl th:each="group : ${groupList}" th:if="${!groupList.isEmpty()}">
+                <dt class="col-sm-9">
+                    <a th:href="@{/user/groups/{groupId}(groupId=${group.id})}" th:text="${group.getName()}"/>
+                </dt>
+            </dl>
+            <p th:unless="${!groupList.isEmpty()}">Not part of any group yet.</p>
+        </div>
+    </div>
+</div>
+<div class="container" th:if="${!notJoinedGroups.isEmpty()}">
+
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>Other groups</h3>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Admin name</th>
+                    <th scope="col">No. of members</th>
+                    <th scope="col">Join</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="group : ${notJoinedGroups}">
+                    <form action="#" th:action="@{/user/groups}" th:object="${group}" method="post">
+                        <td th:text="${group.getName()}"/>
+                        <td th:text="${group.getAdminName()}"/>
+                        <td th:text="${group.getMembersNum()}"/>
+                        <td th:if="${group.getRequestStatus()} == 'Request to join'" class="text-center">
+                            <input type="hidden" th:value="${group.getId()}" name="id"/>
+                            <button type="submit" class="btn btn-outline-primary btn-sm" th:text="${group.getRequestStatus()}"></button>
+                        </td>
+                        <td th:unless="${group.getRequestStatus()} == 'Request to join'" th:text="${group.getRequestStatus()}" class="text-center"/>
+                    </form>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

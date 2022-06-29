@@ -1,0 +1,92 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <link href="/bootstrap.css" rel="stylesheet"/>
+  <link href="/custom.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="navbar-brand">Game Club</div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('SUPERUSER')" class="nav-item">
+        <a class="nav-link active" href="/admin_page">Home</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item active">
+        <a class="nav-link" href="/user/groups">Groups</a>
+      </li>
+      <li sec:authorize="hasAuthority('PLAYER')" class="nav-item">
+        <a class="nav-link" href="/user/games">Games</a>
+      </li>
+      <li sec:authorize="hasAuthority('GROUPADMIN')"  class="nav-item">
+        <a class="nav-link" href="/user/mygroup">My Group</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" action="/logout">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+        Logout
+      </button>
+    </form>
+  </div>
+</nav>
+<div sec:authorize="hasAuthority('PLAYER')" class="container">
+  <div class="card border border-info border-3">
+    <div class="card-header bg-info">
+      <h3>Group details</h3>
+    </div>
+    <div class="card-body bg-light">
+      <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9" th:text="${groupName}"/>
+
+        <dt class="col-sm-3">Admin name</dt>
+        <dd class="col-sm-9" th:text="${groupAdmin}"/>
+      </dl>
+
+      <h6>Members</h6>
+      <table class="table table-bordered bg-white">
+        <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Email address</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="player : ${groupPlayers}">
+          <td th:text="${player.getName()}"/>
+          <td th:text="${player.getEmail()}"/>
+        </tr>
+        </tbody>
+      </table>
+
+      <h6>Events</h6>
+      <table class="table table-bordered bg-white" th:if="${!groupEvents.isEmpty()}">
+        <thead>
+        <tr>
+          <th scope="col">Event Date</th>
+          <th scope="col">Location</th>
+          <th scope="col">Attend</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="event : ${groupEvents}">
+          <form action="#" th:action="@{/user/groups/{Id}(Id=${groupId})}" th:object="${event}" method="post">
+            <td th:text="${event.getEvent_date()}"/>
+            <td th:text="${event.getLocation()}"/>
+            <td th:if="${event.currentPlayerParticipates}">Attending event</td>
+            <td th:unless="${event.currentPlayerParticipates}" class="text-center">
+              <button type="submit" th:value="${event.getId()}" name="id" class="btn btn-outline-primary btn-sm">Attend</button>
+            </td>
+          </form>
+        </tr>
+        </tbody>
+      </table>
+      <p th:unless="${!groupEvents.isEmpty()}">No upcoming events at the moment.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

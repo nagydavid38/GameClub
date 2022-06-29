@@ -1,0 +1,89 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/bootstrap.css" rel="stylesheet"/>
+    <link href="/custom.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="navbar-brand">Game Club</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/user">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/user/groups">Groups</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/user/games">Games</a>
+            </li>
+            <li sec:authorize="hasAuthority('GROUPADMIN')" class="nav-item active">
+                <a class="nav-link" href="/user/mygroup">My Group</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/logout">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                Logout
+            </button>
+        </form>
+    </div>
+</nav>
+<div sec:authorize="hasAuthority('GROUPADMIN')"  class="container">
+    <div class="card border border-info border-3">
+        <div class="card-header bg-info">
+            <h3>Group details</h3>
+        </div>
+        <div class="card-body bg-light">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9" th:text="${groupName}"/>
+            </dl>
+
+            <h6>Members</h6>
+            <table class="table table-bordered bg-white">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email address</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="player : ${groupPlayers}">
+                    <td th:text="${player.getName()}"/>
+                    <td th:text="${player.getEmail()}"/>
+                </tr>
+                </tbody>
+            </table>
+
+            <h6>Join Requests</h6>
+            <table class="table table-bordered bg-white" style="width: 100%" th:if="${!groupJoinRequests.isEmpty()}">
+                <thead>
+                <tr>
+                    <th scope="col" style="width: 70%">Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="joinRequest : ${groupJoinRequests}">
+                    <form action="#" th:action="@{/user/mygroup}" th:object="${joinRequest}" method="post">
+                        <td th:text="${joinRequest.fullName}"/>
+                        <td class="text-center">
+                            <input type="hidden" th:value="${joinRequest.userName}" name="userName"/>
+                            <input type="hidden" th:value="${joinRequest.groupId}" name="groupId"/>
+                            <button type="submit" th:field="${joinRequest.decision}" th:value="ACCEPT" name="decision" class="btn btn-outline-primary btn-sm">Accept</button>
+                            <button type="submit" th:field="${joinRequest.decision}" th:value="REJECT" name="decision" class="btn btn-outline-danger btn-sm">Reject</button>
+                        </td>
+                    </form>
+                </tr>
+                </tbody>
+            </table>
+            <p th:unless="${!groupJoinRequests.isEmpty()}">No new requests at the moment.</p>
+            <h6>
+                <a th:href="@{/user/mygroup/events-{Id}(Id=${groupId})}">Events</a>
+            </h6>
+        </div>
+    </div>
+</div>
+</body>
+</html>
